@@ -1,0 +1,8 @@
+data:
+    gtf: data/{species}/{source}.gtf
+    cerberus:
+      ends: data/{species}/{source}_{end_type}.bed
+      ics: data/{species}/{source}_ic.tsv
+      agg_ends: data/{species}/{end_type}_agg.bed
+      agg_ics: data/{species}/ic_agg.tsv
+      ref: data/{species}/cerberus_ref.h5
