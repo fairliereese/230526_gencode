@@ -6,3 +6,5 @@ data:
       agg_ends: data/{species}/{end_type}_agg.bed
       agg_ics: data/{species}/ic_agg.tsv
       ref: data/{species}/cerberus_ref.h5
+      annot: data/{species}/cerberus_{source}_annot.h5
+      triplets: data/{species}/cerberus_triplets.h5
