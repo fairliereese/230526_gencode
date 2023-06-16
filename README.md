@@ -7,6 +7,7 @@ snakemake \
 ```
 
 ```bash
+conda activate base clone
 snakemake \
   -s Snakefile \
   -j 10 \
@@ -15,4 +16,7 @@ snakemake \
 ```
 
 Links:
-* [CLS GTF](https://crgcnag-my.sharepoint.com/personal/gkaur_crg_es/_layouts/15/onedrive.aspx?id=%2Fpersonal%2Fgkaur%5Fcrg%5Fes%2FDocuments%2FAttachments%2FHv3%5FmasterTable%2Bgencodev42%5Flt1o%5Ftagged%5Floci%2Egtf%2Egz&parent=%2Fpersonal%2Fgkaur%5Fcrg%5Fes%2FDocuments%2FAttachments&ga=1)
+* [Human metadata](https://github.com/guigolab/gencode-cls-master-table/releases/latest/download/Hv3_metadata.tsv.gz)
+* [Mouse metadata](https://github.com/guigolab/gencode-cls-master-table/releases/latest/download/Mv2_metadata.tsv.gz)
+
+* For the metadata files, I manually added column names

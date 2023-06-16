@@ -1,10 +1,22 @@
+# data:
+#     gtf: data/{species}/{source}.gtf
+#     cerberus:
+#       ends: data/{species}/{source}_{end_type}.bed
+#       ics: data/{species}/{source}_ic.tsv
+#       agg_ends: data/{species}/{end_type}_agg.bed
+#       agg_ics: data/{species}/ic_agg.tsv
+#       ref: data/{species}/cerberus_ref.h5
+#       annot: data/{species}/cerberus_{source}_annot.h5
+#       triplets: data/{species}/cerberus_triplets.h5
+#
+# ref:
+#   human:
+#     meta_link: https://github.com/guigolab/gencode-cls-master-table/releases/latest/download/Hv3_metadata.tsv.gz
+#   mouse:
+#     meta_link: https://github.com/guigolab/gencode-cls-master-table/releases/latest/download/Mv2_metadata.tsv.gz
+#   meta_gz: ref/{species}/metadata.tsv.gz
+#   meta: ref/{species}/metadata.tsv
+
 data:
-    gtf: data/{species}/{source}.gtf
-    cerberus:
-      ends: data/{species}/{source}_{end_type}.bed
-      ics: data/{species}/{source}_ic.tsv
-      agg_ends: data/{species}/{end_type}_agg.bed
-      agg_ics: data/{species}/ic_agg.tsv
-      ref: data/{species}/cerberus_ref.h5
-      annot: data/{species}/cerberus_{source}_annot.h5
-      triplets: data/{species}/cerberus_triplets.h5
+  meta: data/{species}/metadata.tsv
+  gff_gz: data/{species}/{dataset}.gff.gz
