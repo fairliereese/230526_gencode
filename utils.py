@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from snakemake.io import expand
+import pyranges as pr
 
 
 def get_dataset_df_col(wc, df, col):
@@ -39,3 +40,23 @@ def parse_input_config(config, config_file, subset):
     print(len(df.dataset.unique()))
     # print(df.head())
     return df
+
+def get_ab_from_gff(gff_file, ofile):
+    """
+    Get abundance from the tagged values in the GFF file
+    """
+    df = pr.read_gff(gff_file).as_df()
+    df = df[['transcript_id', 'flrpm', 'rpm']]
+    df = df.drop_duplicates()
+    assert len(df.loc[df.transcript_id.duplicated(keep=False)].index) == 0
+    df.to_csv(ofile, sep='\t', index=False)
+
+
+def gff_rm_sirv(gff_file, ofile):
+    """
+    Remove SIRV chromosomes from GFF file
+    """
+    df = pr.read_gff(gff_file).as_df()
+    df = df.loc[df.Chromosome!='SIRVome_isoforms']
+    df = pr.PyRanges(df)
+    df.to_gtf(ofile)

@@ -43,3 +43,7 @@ python ${sqpath}sqanti3_qc.py \
    --skipORF \
    -o $opref
 ```
+
+```bash
+wget -O data/human/Placenta_Placenta_pacBioSII_post-capture_human_all.gff.gz https://public-docs.crg.es/rguigo/Data/gkaur/LyRic_CLS3_TM_perTissue/SIDHPlPPC0101.splicing_status-all.endSupport-all.gff.gz --user=user_cls --password=Gencode@CLS_2022
+```
