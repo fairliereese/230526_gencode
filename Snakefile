@@ -195,16 +195,18 @@ rule sqanti:
         "SQANTI3.env"
     params:
         sq_path = config['sqanti_path'],
-        opref = config['data']['sqanti_gff'].split('_corrected')[0]
+        opref = config['data']['sqanti_gff'].split('_corrected')[0],
+        odir = config['data']['sqanti_gff'].split('_sqanti')[0]+'/'
     output:
         gff = config['data']['sqanti_gff']
     shell:
         """
+        mkdir {params.odir}
         python {params.sq_path}sqanti3_qc.py \
             {input.gtf} \
             {input.annot} \
             {input.fa} \
-            -d {params.opref}/ \
+            -d {params.odir} \
             --force_id_ignore \
             --aligner_choice minimap2 \
             --skipORF \
