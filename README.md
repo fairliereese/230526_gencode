@@ -3,7 +3,8 @@ snakemake \
   -s Snakefile \
   -j 100 \
   --latency-wait 120 \
-  --cluster "sbatch -A seyedam_lab --partition=highmem --mem={resources.mem_gb}GB -c {resources.threads} --mail-user=freese@uci.edu --mail-type=START,END, --time=72:00:00" -n
+  --use_conda \
+  --cluster "sbatch -A seyedam_lab --partition=highmem --mem={resources.mem_gb}GB -c {resources.threads} --mail-user=freese@uci.edu --mail-type=START,END --time=72:00:00" -n
 ```
 
 ```bash

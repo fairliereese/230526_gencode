@@ -15,16 +15,35 @@ df = parse_input_config(config, config_fname, 'all')
 datasets = df.dataset.tolist()
 species = df.species.tolist()
 
+species = species[:5]
+datasets = datasets[:5]
+
 #
 cerb_tsv = 'cerberus.tsv'
 cerb_settings = pd.read_csv(cerb_tsv, sep='\t')
 
+wildcard_constraints:
+    dataset= '|'.join([re.escape(x) for x in datasets]),
+
 rule all:
     input:
-        expand(config['data']['gff_gz'],
-               zip,
-               species=species,
-               dataset=datasets)
+        expand(expand(config['data']['cerb']['ends'],
+            zip,
+            species=species,
+            dataset=datasets,
+            allow_missing=True),
+            end_mode=end_types),
+        expand(config['data']['cerb']['ics'],
+                zip,
+                species=species,
+                dataset=datasets)
+        # expand(config['data']['cerb']['ca_ref'],
+        #        species=species)
+
+        # expand(config['data']['gff_gz'],
+        #        zip,
+        #        species=species,
+        #        dataset=datasets)
 
 ################################################################################
 ########################### Ref. processing ####################################
@@ -65,26 +84,25 @@ use rule gunzip as gunzip_gff with:
     output:
         out = config['data']['gff']
 
-# TODO download reference genome / annotation
-use rule dl as dl_annot:
+use rule dl as dl_annot with:
     params:
         link = lambda wc: config['ref'][wc.species]['annot_link']
     output:
         out = config['ref']['annot_gz']
 
-use rule dl as dl_fa:
+use rule dl as dl_fa with:
     params:
         link = lambda wc: config['ref'][wc.species]['fa_link']
     output:
         out = config['ref']['fa_gz']
 
-use rule gunzip as gunzip_annot:
+use rule gunzip as gunzip_annot with:
     input:
         gz = config['ref']['annot_gz']
     output:
         out = config['ref']['annot']
 
-use rule gunzip as gunzip_annot:
+use rule gunzip as gunzip_fa with:
     input:
         gz = config['ref']['fa_gz']
     output:
@@ -120,7 +138,7 @@ rule cerb_gtf_to_ics:
         cerberus.gtf_to_ics(input.gtf,
                             output.ics)
 
-use rule cerb_gtf_to_bed as ref_cerb_gtf_to_bed:
+use rule cerb_gtf_to_bed as ref_cerb_gtf_to_bed with:
     input:
         gtf = config['ref']['annot']
     output:
@@ -129,7 +147,7 @@ use rule cerb_gtf_to_bed as ref_cerb_gtf_to_bed:
         slack = lambda wc:get_cerb_settings(wc, cerb_settings, 'slack'),
         dist = lambda wc:get_cerb_settings(wc, cerb_settings, 'dist')
 
-use rule cerb_gtf_to_ics as ref_cerb_gtf_to_ics:
+use rule cerb_gtf_to_ics as ref_cerb_gtf_to_ics with:
     input:
         gtf = config['ref']['annot']
     output:
@@ -169,23 +187,24 @@ rule sqanti:
     input:
         gtf = config['data']['gtf_no_sirv'],
         fa = config['ref']['fa'],
-        annot = config['ref']['gtf']
+        annot = config['ref']['annot']
     resources:
         mem_gb = 128,
         threads = 8
     conda:
         "SQANTI3.env"
     params:
-        sq_path = config['sqanti_path']
+        sq_path = config['sqanti_path'],
         opref = config['data']['sqanti_gff'].split('_corrected')[0]
     output:
         gff = config['data']['sqanti_gff']
     shell:
         """
-        python {params.sq_path} \
+        python {params.sq_path}sqanti3_qc.py \
             {input.gtf} \
             {input.annot} \
             {input.fa} \
+            -d {params.opref}/ \
             --force_id_ignore \
             --aligner_choice minimap2 \
             --skipORF \
@@ -196,7 +215,7 @@ rule sqanti:
 ############################## Cerberus ########################################
 ################################################################################
 
-use rule cerb_gtf_to_bed as data_cerb_gtf_to_bed:
+use rule cerb_gtf_to_bed as data_cerb_gtf_to_bed with:
     input:
         gtf = config['data']['sqanti_gff']
     output:
@@ -205,7 +224,7 @@ use rule cerb_gtf_to_bed as data_cerb_gtf_to_bed:
         slack = lambda wc:get_cerb_settings(wc, cerb_settings, 'slack'),
         dist = lambda wc:get_cerb_settings(wc, cerb_settings, 'dist')
 
-use rule cerb_gtf_to_ics as data_cerb_gtf_to_ics:
+use rule cerb_gtf_to_ics as data_cerb_gtf_to_ics with:
     input:
         gtf = config['data']['sqanti_gff']
     output:
@@ -229,23 +248,24 @@ def get_agg_settings(wc, param='files'):
     else:
         files += expand(config['ref']['ends'],
                         zip,
-                        end_mode=wc.end_mode)
-    sources += ['cerberus']
+                        end_mode=wc.end_mode,
+                        species=wc.species)
+    sources += ['gencode']
 
     # then get the files from each study
     # use the studies as the sources
     if ic == True:
         files += expand(expand(config['data']['cerb']['ics'],
                zip,
-               study=studies,
+               dataset=datasets,
                allow_missing=True),
-               batch=batch)
+               species=wc.species)
     else:
         files += expand(expand(config['data']['cerb']['ends'],
                zip,
-               study=studies,
+               dataset=datasets,
                allow_missing=True),
-               batch=batch,
+               species=wc.species,
                end_mode=wc.end_mode)
     sources += studies
 
@@ -300,10 +320,12 @@ rule cerb_write_ref:
     input:
         ic = config['data']['cerb']['agg_ics'],
         tss = lambda wc:expand(config['data']['cerb']['agg_ends'],
-                               batch=wc.batch,
+                               dataset=wc.dataset,
+                               species=wc.species,
                                end_mode='tss')[0],
         tes = lambda wc:expand(config['data']['cerb']['agg_ends'],
-                              batch=wc.batch,
+                              dataset=wc.dataset,
+                              species=wc.species,
                               end_mode='tes')[0]
     resources:
         threads = 4,
