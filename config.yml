@@ -39,7 +39,7 @@ data:
   gtf_no_sirv: data/{species}/{dataset}_no_sirv.gff
   ab: data/{species}/{dataset}_abundance.tsv
 
-  sqanti_gff: data/{species}/{dataset}_sqanti_corrected.gtf.cds.gff
+  sqanti_gff: data/{species}/{dataset}/{dataset}_sqanti_corrected.gtf.cds.gff
 
   cerb:
     ends: data/{species}/cerberus/{dataset}/{end_mode}.bed
@@ -50,3 +50,4 @@ data:
     ca_ref: data/{species}/cerberus/ca_ref.h5
 
 sqanti_path: /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/
+cupcake_path: /dfs8/pub/freese//mortazavi_lab/bin/cDNA_Cupcake/

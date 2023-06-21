@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from snakemake.io import expand
 import pyranges as pr
+import os
 
 
 def get_dataset_df_col(wc, df, col):

@@ -12,11 +12,15 @@ end_types = ['tss', 'tes']
 # data config
 config_fname = '230614_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
+
+# todo
+df = df.loc[df.species =='human']
+
 datasets = df.dataset.tolist()
 species = df.species.tolist()
 
-species = species[:5]
-datasets = datasets[:5]
+species = species[:2]
+datasets = datasets[:2]
 
 #
 cerb_tsv = 'cerberus.tsv'
@@ -27,6 +31,7 @@ wildcard_constraints:
 
 rule all:
     input:
+        # 'beep_env.out'
         expand(expand(config['data']['cerb']['ends'],
             zip,
             species=species,
@@ -44,6 +49,19 @@ rule all:
         #        zip,
         #        species=species,
         #        dataset=datasets)
+
+# rule debug_envs:
+#     conda:
+#         "SQANTI3.env"
+#     resources:
+#         threads = 1,
+#         mem_gb = 4
+#     output:
+#         out = 'beep_env.out'
+#     shell:
+#         """
+#             python test.py > {output.out}
+#         """
 
 ################################################################################
 ########################### Ref. processing ####################################
@@ -195,13 +213,14 @@ rule sqanti:
         "SQANTI3.env"
     params:
         sq_path = config['sqanti_path'],
-        opref = config['data']['sqanti_gff'].split('_corrected')[0],
-        odir = config['data']['sqanti_gff'].split('_sqanti')[0]+'/'
+        c_path = config['cupcake_path'],
+        opref = config['data']['sqanti_gff'].split('/')[-1].split('_corrected')[0],
+        odir = '/'.join(config['data']['sqanti_gff'].split('/')[:-1])+'/'
     output:
         gff = config['data']['sqanti_gff']
     shell:
         """
-        mkdir {params.odir}
+        mkdir -p {params.odir}
         python {params.sq_path}sqanti3_qc.py \
             {input.gtf} \
             {input.annot} \
@@ -210,6 +229,7 @@ rule sqanti:
             --force_id_ignore \
             --aligner_choice minimap2 \
             --skipORF \
+            --cupcake_path {params.c_path} \
             -o {params.opref}
         """
 
