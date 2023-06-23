@@ -31,23 +31,25 @@ ref:
 
   ends: ref/{species}/{end_mode}.bed
   ics: ref/{species}/ics.tsv
+  ca_annot: ref/{species}/ca_annot.h5
 
 data:
   meta: data/{species}/metadata.tsv
-  gff_gz: data/{species}/{dataset}.gff.gz
-  gff: data/{species}/{dataset}.gff
-  gtf_no_sirv: data/{species}/{dataset}_no_sirv.gff
-  ab: data/{species}/{dataset}_abundance.tsv
+  gff_gz: data/{species}/raw/{dataset}.gff.gz
+  gff: data/{species}/raw/{dataset}.gff
+  gtf_no_sirv: data/{species}/raw/{dataset}_no_sirv.gff
+  ab: data/{species}/raw/{dataset}_abundance.tsv
 
-  sqanti_gff: data/{species}/{dataset}/{dataset}_sqanti_corrected.gtf.cds.gff
+  sqanti_gff: data/{species}/sqanti/{dataset}/{dataset}_sqanti_corrected.gtf.cds.gff
 
   cerb:
     ends: data/{species}/cerberus/{dataset}/{end_mode}.bed
     ics: data/{species}/cerberus/{dataset}/ics.tsv
-    agg_ends: data/{species}/cerberus/agg_ends.bed
+    agg_ends: data/{species}/cerberus/agg_{end_mode}.bed
     agg_ics: data/{species}/cerberus/agg_ics.tsv
 
     ca_ref: data/{species}/cerberus/ca_ref.h5
+    ca_annot: data/{species}/cerberus/{dataset}/ca_{cerberus_run}_annot.h5
 
 sqanti_path: /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/
 cupcake_path: /dfs8/pub/freese//mortazavi_lab/bin/cDNA_Cupcake/

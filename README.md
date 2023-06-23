@@ -8,6 +8,11 @@ snakemake \
 ```
 
 ```bash
+conda activate viz_snakemake
+snakemake -s Snakefile --dag | dot -Tpng > ruledag.png
+```
+
+```bash
 conda activate base_clone
 snakemake \
   -s Snakefile \

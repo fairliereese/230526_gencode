@@ -14,17 +14,17 @@ config_fname = '230614_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
-df = df.loc[df.species =='human']
+df = df.loc[df.species == 'mouse']
 
 datasets = df.dataset.tolist()
 species = df.species.tolist()
+max_cerberus_run = len(datasets) # TODO modify to work w/ multiple species
 
-species = species[:2]
-datasets = datasets[:2]
-
-#
 cerb_tsv = 'cerberus.tsv'
 cerb_settings = pd.read_csv(cerb_tsv, sep='\t')
+
+def get_df_col(df, q_col, q_col_val, t_col):
+    return df.loc[df[q_col]==q_col_val, t_col].tolist()
 
 wildcard_constraints:
     dataset= '|'.join([re.escape(x) for x in datasets]),
@@ -32,23 +32,24 @@ wildcard_constraints:
 rule all:
     input:
         # 'beep_env.out'
-        expand(expand(config['data']['cerb']['ends'],
-            zip,
-            species=species,
-            dataset=datasets,
-            allow_missing=True),
-            end_mode=end_types),
-        expand(config['data']['cerb']['ics'],
-                zip,
-                species=species,
-                dataset=datasets)
+        # expand(expand(config['data']['cerb']['ends'],
+        #     zip,
+        #     species=species,
+        #     dataset=datasets,
+        #     allow_missing=True),
+        #     end_mode=end_types),
+        # expand(config['data']['cerb']['ics'],
+        #         zip,
+        #         species=species,
+        #         dataset=datasets)
         # expand(config['data']['cerb']['ca_ref'],
-        #        species=species)
-
-        # expand(config['data']['gff_gz'],
         #        zip,
-        #        species=species,
-        #        dataset=datasets)
+        #        species=species)
+        expand(config['data']['ca_annot'],
+               zip,
+               species=species,
+               dataset=dataset[-1],
+               cerberus_run=max_cerberus_run)
 
 # rule debug_envs:
 #     conda:
@@ -226,6 +227,7 @@ rule sqanti:
             {input.annot} \
             {input.fa} \
             -d {params.odir} \
+            --report skip \
             --force_id_ignore \
             --aligner_choice minimap2 \
             --skipORF \
@@ -275,21 +277,21 @@ def get_agg_settings(wc, param='files'):
     sources += ['gencode']
 
     # then get the files from each study
-    # use the studies as the sources
+    # use the datasets as the sources
     if ic == True:
         files += expand(expand(config['data']['cerb']['ics'],
                zip,
-               dataset=datasets,
+               dataset=get_df_col(df, 'species', wc.species, 'dataset'),
                allow_missing=True),
                species=wc.species)
     else:
         files += expand(expand(config['data']['cerb']['ends'],
                zip,
-               dataset=datasets,
+               dataset=get_df_col(df, 'species', wc.species, 'dataset'),
                allow_missing=True),
                species=wc.species,
                end_mode=wc.end_mode)
-    sources += studies
+    sources += datasets
 
     settings['file'] = files
     settings['source'] = sources
@@ -333,6 +335,7 @@ rule cerb_agg_ics:
       ics = config['data']['cerb']['agg_ics']
   run:
       refs = [params.refs for i in range(len(input.files))]
+      refs[0] = True
       cerberus.agg_ics(input.files,
                         refs,
                         params.sources,
@@ -342,11 +345,9 @@ rule cerb_write_ref:
     input:
         ic = config['data']['cerb']['agg_ics'],
         tss = lambda wc:expand(config['data']['cerb']['agg_ends'],
-                               dataset=wc.dataset,
                                species=wc.species,
                                end_mode='tss')[0],
         tes = lambda wc:expand(config['data']['cerb']['agg_ends'],
-                              dataset=wc.dataset,
                               species=wc.species,
                               end_mode='tes')[0]
     resources:
@@ -359,3 +360,55 @@ rule cerb_write_ref:
                                  input.tes,
                                  input.ic,
                                  output.h5)
+
+ ################################################################################
+ ######################### Cerberus annot + ID replacement ######################
+ ################################################################################
+
+rule cerb_annot:
+    resources:
+        mem_gb = 64,
+        threads = 16
+run:
+    cerberus.annotate_transcriptome(input.gtf,
+                                 input.h5,
+                                 params.source,
+                                 params.gene_source,
+                                 output.h5)
+
+use rule cerb_annot as ref_cerb_annot with:
+    input:
+        h5 = config['data']['cerb']['ca_ref'],
+        gtf = lambda wc: config['ref']['annot']
+    params:
+        source = 'gencode',
+        gene_source = None
+    output:
+        h5 = config['ref']['ca_annot']
+
+def get_prev_ca_annot(wc):
+    # TODO - modify to work w/ multiple species
+    if wc.cerberus_run == 0:
+        ca = expand(config['ref']['ca_annot'],
+                    zip,
+                    species=wc.species)
+    else:
+        prev_run = int(wc.cerberus_run)-1
+        prev_dataset = datasets[prev_run]
+        ca = expand(config['data']['cerb']['ca_annot'],
+                    zip,
+                    dataset=prev_dataset,
+                    cerberus_run=prev_run,
+                    species=wc.species)
+    return ca
+
+# TODO need this to modify the same cerberus obj sequentially
+use rule cerb_annot as study_cerb_annot with:
+    input:
+        h5 = lambda wc: get_prev_ca_annot(wc, cerberus_run)
+        gtf = config['data']['gtf_no_sirv']
+    params:
+        source = lambda wc:wc.dataset,
+        gene_source = 'gencode'
+    output:
+        h5 = config['data']['ca_annot']
