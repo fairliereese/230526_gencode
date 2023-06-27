@@ -54,8 +54,8 @@ rule all:
         #        cerberus_run=max_cerberus_run)
         expand(config['data']['gtf_no_sirv'],
                zip,
-               species=species,
-               dataset=datasets)
+               species=species[0],
+               dataset=datasets[0])
 
 # rule debug_envs:
 #     conda:
