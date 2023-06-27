@@ -14,7 +14,9 @@ config_fname = '230614_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
-df = df.loc[df.species == 'mouse']
+# df = df.loc[df.species == 'mouse']
+df = df.loc[df.species == 'human']
+
 
 datasets = df.dataset.tolist()
 species = df.species.tolist()
@@ -45,11 +47,15 @@ rule all:
         # expand(config['data']['cerb']['ca_ref'],
         #        zip,
         #        species=species)
-        expand(config['data']['ca_annot'],
+        # expand(config['data']['cerb']['ca_annot'],
+        #        zip,
+        #        species=species,
+        #        dataset=datasets[-1],
+        #        cerberus_run=max_cerberus_run)
+        expand(config['data']['gtf_no_sirv'],
                zip,
                species=species,
-               dataset=dataset[-1],
-               cerberus_run=max_cerberus_run)
+               dataset=datasets)
 
 # rule debug_envs:
 #     conda:
@@ -127,6 +133,20 @@ use rule gunzip as gunzip_fa with:
     output:
         out = config['ref']['fa']
 
+# # get a mapping between the chr names used in the reference
+# # hg38 fa and the gffs
+# rule get_gff_fa_chr_map:
+#     input:
+#         gffs = lambda wc: expand(expand(config['data']['gtf_no_sirv'],
+#                       zip,
+#                       dataset=datasets,
+#                       allow_missing=True),
+#                       species=wc.species)
+#         fa = lambda wc: expand(config['ref']['chr_map'],
+#                     zip,
+#                     species=wc.species)
+
+
 ################################################################################
 ########################## Cerberus ref stuff ##################################
 ################################################################################
@@ -190,6 +210,8 @@ rule get_gff_ab:
 rule rm_sirv:
     input:
         gff = config['data']['gff']
+    params:
+        chr_map = config['ref']['chr_map']
     resources:
         mem_gb = 64,
         threads = 4
@@ -197,6 +219,11 @@ rule rm_sirv:
         gtf = config['data']['gtf_no_sirv']
     run:
         gff_rm_sirv(input.gff, output.gtf)
+        # if we have human data too, also correct the chr names
+
+        if wildcards.species=='human':
+            gff_fix_chr_names(output.gtf, output.gtf, params.chr_map)
+
 
 ################################################################################
 ################################# SQANTI #######################################
@@ -369,12 +396,12 @@ rule cerb_annot:
     resources:
         mem_gb = 64,
         threads = 16
-run:
-    cerberus.annotate_transcriptome(input.gtf,
-                                 input.h5,
-                                 params.source,
-                                 params.gene_source,
-                                 output.h5)
+    run:
+        cerberus.annotate_transcriptome(input.gtf,
+                                     input.h5,
+                                     params.source,
+                                     params.gene_source,
+                                     output.h5)
 
 use rule cerb_annot as ref_cerb_annot with:
     input:
@@ -388,7 +415,7 @@ use rule cerb_annot as ref_cerb_annot with:
 
 def get_prev_ca_annot(wc):
     # TODO - modify to work w/ multiple species
-    if wc.cerberus_run == 0:
+    if int(wc.cerberus_run) == 0:
         ca = expand(config['ref']['ca_annot'],
                     zip,
                     species=wc.species)
@@ -405,10 +432,10 @@ def get_prev_ca_annot(wc):
 # TODO need this to modify the same cerberus obj sequentially
 use rule cerb_annot as study_cerb_annot with:
     input:
-        h5 = lambda wc: get_prev_ca_annot(wc, cerberus_run)
+        h5 = lambda wc: get_prev_ca_annot(wc),
         gtf = config['data']['gtf_no_sirv']
     params:
         source = lambda wc:wc.dataset,
         gene_source = 'gencode'
     output:
-        h5 = config['data']['ca_annot']
+        h5 = config['data']['cerb']['ca_annot']
