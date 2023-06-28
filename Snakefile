@@ -17,10 +17,10 @@ df = parse_input_config(config, config_fname, 'all')
 # df = df.loc[df.species == 'mouse']
 df = df.loc[df.species == 'human']
 
-
 datasets = df.dataset.tolist()
 species = df.species.tolist()
-max_cerberus_run = len(datasets) # TODO modify to work w/ multiple species
+# max_cerberus_run = len(datasets) # TODO modify to work w/ multiple species
+cerberus_runs = df.cerberus_run.tolist()
 
 cerb_tsv = 'cerberus.tsv'
 cerb_settings = pd.read_csv(cerb_tsv, sep='\t')
@@ -47,15 +47,15 @@ rule all:
         # expand(config['data']['cerb']['ca_ref'],
         #        zip,
         #        species=species)
-        # expand(config['data']['cerb']['ca_annot'],
-        #        zip,
-        #        species=species,
-        #        dataset=datasets[-1],
-        #        cerberus_run=max_cerberus_run)
-        expand(config['data']['gtf_no_sirv'],
+        expand(config['data']['cerb']['ca_annot'],
                zip,
-               species=species[0],
-               dataset=datasets[0])
+               species=species,
+               dataset=datasets[-1],
+               cerberus_run=cerberus_runs)
+        # expand(config['data']['gtf_no_sirv'],
+        #        zip,
+        #        species=species[0],
+        #        dataset=datasets[0])
 
 # rule debug_envs:
 #     conda:
@@ -429,7 +429,6 @@ def get_prev_ca_annot(wc):
                     species=wc.species)
     return ca
 
-# TODO need this to modify the same cerberus obj sequentially
 use rule cerb_annot as study_cerb_annot with:
     input:
         h5 = lambda wc: get_prev_ca_annot(wc),

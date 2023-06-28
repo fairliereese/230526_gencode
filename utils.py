@@ -38,8 +38,14 @@ def parse_input_config(config, config_file, subset):
 
     df = df.loc[df.subset==subset]
     df['link'] = df.path+df.fname
-    print(len(df.dataset.unique()))
-    # print(df.head())
+
+    # assign a cerberus run to each dataset
+    df['cerberus_run'] = df.sort_values(by=['species', 'dataset'],
+                                 ascending=[True, True],
+                                 na_position='last')\
+                                 .groupby(['species'])\
+                                 .cumcount() + 1
+
     return df
 
 def get_ab_from_gff(gff_file, ofile):
