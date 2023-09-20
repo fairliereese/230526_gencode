@@ -353,8 +353,8 @@ rule cerb_agg_ics:
   input:
       files = lambda wc:get_agg_settings(wc, 'file')
   resources:
-    threads = 4,
-    mem_gb = 32
+    threads = 16,
+    mem_gb = 128
   params:
       refs = False,
       sources = lambda wc:get_agg_settings(wc, 'source')
