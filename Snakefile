@@ -25,6 +25,10 @@ cerberus_runs = df.cerberus_run.tolist()
 cerb_tsv = 'cerberus.tsv'
 cerb_settings = pd.read_csv(cerb_tsv, sep='\t')
 
+# print(datasets)
+# print(cerberus_runs)
+# import pdb; pdb.set_trace()
+
 def get_df_col(df, q_col, q_col_val, t_col):
     return df.loc[df[q_col]==q_col_val, t_col].tolist()
 
@@ -47,11 +51,16 @@ rule all:
         # expand(config['data']['cerb']['ca_ref'],
         #        zip,
         #        species=species)
+        # expand(config['data']['cerb']['ca_annot'],
+        #        zip,
+        #        species=species,
+        #        dataset=datasets[-1],
+        #        cerberus_run=cerberus_runs)
         expand(config['data']['cerb']['ca_annot'],
                zip,
                species=species,
-               dataset=datasets[-1],
-               cerberus_run=cerberus_runs)
+               dataset=datasets[1],
+               cerberus_run=cerberus_runs[1])
         # expand(config['data']['gtf_no_sirv'],
         #        zip,
         #        species=species[0],
@@ -406,7 +415,7 @@ rule cerb_annot:
 use rule cerb_annot as ref_cerb_annot with:
     input:
         h5 = config['data']['cerb']['ca_ref'],
-        gtf = lambda wc: config['ref']['annot']
+        gtf = config['ref']['annot']
     params:
         source = 'gencode',
         gene_source = None
@@ -415,10 +424,10 @@ use rule cerb_annot as ref_cerb_annot with:
 
 def get_prev_ca_annot(wc):
     # TODO - modify to work w/ multiple species
-    if int(wc.cerberus_run) == 0:
+    if int(wc.cerberus_run) == 1:
         ca = expand(config['ref']['ca_annot'],
                     zip,
-                    species=wc.species)
+                    species=wc.species)[0]
     else:
         prev_run = int(wc.cerberus_run)-1
         prev_dataset = datasets[prev_run]
@@ -426,13 +435,13 @@ def get_prev_ca_annot(wc):
                     zip,
                     dataset=prev_dataset,
                     cerberus_run=prev_run,
-                    species=wc.species)
+                    species=wc.species)[0]
     return ca
 
 use rule cerb_annot as study_cerb_annot with:
     input:
         h5 = lambda wc: get_prev_ca_annot(wc),
-        gtf = config['data']['gtf_no_sirv']
+        gtf = config['data']['sqanti_gff']
     params:
         source = lambda wc:wc.dataset,
         gene_source = 'gencode'

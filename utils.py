@@ -46,6 +46,7 @@ def parse_input_config(config, config_file, subset):
                                  .groupby(['species'])\
                                  .cumcount() + 1
 
+    df = df.sort_values(by='cerberus_run', ascending=True)
     return df
 
 def get_ab_from_gff(gff_file, ofile):
