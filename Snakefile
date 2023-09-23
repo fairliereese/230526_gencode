@@ -22,6 +22,8 @@ species = df.species.tolist()
 # max_cerberus_run = len(datasets) # TODO modify to work w/ multiple species
 cerberus_runs = df.cerberus_run.tolist()
 
+import pdb; pdb.set_trace()
+
 cerb_tsv = 'cerberus.tsv'
 cerb_settings = pd.read_csv(cerb_tsv, sep='\t')
 
