@@ -22,8 +22,6 @@ species = df.species.tolist()
 # max_cerberus_run = len(datasets) # TODO modify to work w/ multiple species
 cerberus_runs = df.cerberus_run.tolist()
 
-import pdb; pdb.set_trace()
-
 cerb_tsv = 'cerberus.tsv'
 cerb_settings = pd.read_csv(cerb_tsv, sep='\t')
 
@@ -432,7 +430,8 @@ def get_prev_ca_annot(wc):
                     species=wc.species)[0]
     else:
         prev_run = int(wc.cerberus_run)-1
-        prev_dataset = datasets[prev_run]
+        prev_run_ind = prev_run - 1
+        prev_dataset = datasets[prev_run_ind]
         ca = expand(config['data']['cerb']['ca_annot'],
                     zip,
                     dataset=prev_dataset,
