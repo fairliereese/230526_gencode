@@ -56,11 +56,15 @@ rule all:
         #        species=species,
         #        dataset=datasets[-1],
         #        cerberus_run=cerberus_runs)
+        expand(config['data']['ab'],
+               zip,
+               species=species,
+               dataset=datasets),
         expand(config['data']['cerb']['ca_annot'],
                zip,
                species=species,
                dataset=datasets[-1],
-               cerberus_run=cerberus_runs[-1])
+               cerberus_run=cerberus_runs[-1]),
         # expand(config['data']['gtf_no_sirv'],
         #        zip,
         #        species=species[0],
