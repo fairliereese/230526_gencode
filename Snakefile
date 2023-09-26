@@ -464,6 +464,9 @@ rule format_tmerge_ab:
     params:
         metric = 'flrpm',
         dataset = lambda wc:wc.dataset
+    resources:
+        mem_gb = 4,
+        threads = 1
     output:
         ab = config['data']['ab_fmt']
     run:
@@ -473,6 +476,9 @@ rule format_tmerge_ab:
                          output.ab)
 
 rule cerb_ab:
+    resources:
+        mem_gb = 64,
+        threads = 2
     run:
         cerberus.replace_ab_ids(input.ab,
                                 input.h5,
