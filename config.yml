@@ -41,6 +41,7 @@ data:
   gff: data/{species}/raw/{dataset}.gff
   gtf_no_sirv: data/{species}/raw/{dataset}_no_sirv.gff
   ab: data/{species}/raw/{dataset}_abundance.tsv
+  ab_fmt: data/{species}/raw/{dataset}_abundance_formatted.tsv
 
   sqanti_gff: data/{species}/sqanti/{dataset}/{dataset}_sqanti_corrected.gtf.cds.gff
 
@@ -52,6 +53,8 @@ data:
 
     ca_ref: data/{species}/cerberus/ca_ref.h5
     ca_annot: data/{species}/cerberus/ca_{cerberus_run}_annot.h5
+
+    ab: data/{species}/cerberus/{dataset}/ab.tsv
 
 sqanti_path: /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/
 cupcake_path: /dfs8/pub/freese//mortazavi_lab/bin/cDNA_Cupcake/

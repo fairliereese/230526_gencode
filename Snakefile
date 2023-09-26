@@ -56,15 +56,19 @@ rule all:
         #        species=species,
         #        dataset=datasets[-1],
         #        cerberus_run=cerberus_runs)
-        expand(config['data']['ab'],
+        # expand(config['data']['ab'],
+        #        zip,
+        #        species=species,
+        #        dataset=datasets),
+        expand(config['data']['cerb']['ab'],
                zip,
-               species=species,
-               dataset=datasets),
-        expand(config['data']['cerb']['ca_annot'],
-               zip,
-               species=species,
-               dataset=datasets[-1],
-               cerberus_run=cerberus_runs[-1]),
+               species=species[0],
+               dataset=datasets[0])
+        # expand(config['data']['cerb']['ca_annot'],
+        #        zip,
+        #        species=species,
+        #        dataset=datasets[-1],
+        #        cerberus_run=cerberus_runs[-1]),
         # expand(config['data']['gtf_no_sirv'],
         #        zip,
         #        species=species[0],
@@ -452,3 +456,31 @@ use rule cerb_annot as study_cerb_annot with:
         gene_source = 'gencode'
     output:
         h5 = config['data']['cerb']['ca_annot']
+
+rule format_tmerge_ab:
+    input:
+        ab = config['data']['ab']
+    dataset:
+        dataset = lambda wc:wc.dataset
+    params:
+        metric = 'flrpm'
+    output:
+        ab = config['data']['ab_fmt']
+
+rule cerb_ab:
+    run:
+        cerberus.replace_ab_ids(input.ab,
+                                input.h5,
+                                params.source,
+                                params.agg,
+                                output.ab)
+
+use rule cerb_ab as study_cerb_ab with:
+    input:
+        h5 = config['data']['cerb']['ca_annot'],
+        ab = config['data']['ab_fmt']
+    params:
+        source = lambda wc:wc.dataset,
+        agg = True
+    output:
+        ab = config['data']['cerb']['ab']

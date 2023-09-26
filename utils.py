@@ -59,6 +59,18 @@ def get_ab_from_gff(gff_file, ofile):
     assert len(df.loc[df.transcript_id.duplicated(keep=False)].index) == 0
     df.to_csv(ofile, sep='\t', index=False)
 
+def format_tmerge_ab(ab, dataset, metric, ofile):
+    """
+    Format abundance file from tmerge GFF into a format
+    that Cerberus can deal with
+    """
+    df = pd.read_csv(ab, dataset, sep='\t')
+    df['annot_transcript_id'] = df['transcript_id']
+    df['annot_transcript_name'] = df['transcript_id']
+    df[dataset] = df[metric]
+    df.to_csv(ofile, sep='\t', index=False)
+
+
 
 def gff_rm_sirv(gff_file, ofile):
     """
