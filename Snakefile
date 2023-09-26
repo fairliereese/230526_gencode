@@ -63,7 +63,8 @@ rule all:
         expand(config['data']['cerb']['ab'],
                zip,
                species=species[0],
-               dataset=datasets[0])
+               dataset=datasets[0],
+               cerberus_run=cerberus_runs[0])
         # expand(config['data']['cerb']['ca_annot'],
         #        zip,
         #        species=species,
@@ -460,12 +461,16 @@ use rule cerb_annot as study_cerb_annot with:
 rule format_tmerge_ab:
     input:
         ab = config['data']['ab']
-    dataset:
-        dataset = lambda wc:wc.dataset
     params:
-        metric = 'flrpm'
+        metric = 'flrpm',
+        dataset = lambda wc:wc.dataset
     output:
         ab = config['data']['ab_fmt']
+    run:
+        format_tmerge_ab(input.ab,
+                         params.dataset,
+                         params.metric,
+                         output.ab)
 
 rule cerb_ab:
     run:

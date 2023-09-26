@@ -52,9 +52,12 @@ data:
     agg_ics: data/{species}/cerberus/agg_ics.tsv
 
     ca_ref: data/{species}/cerberus/ca_ref.h5
-    ca_annot: data/{species}/cerberus/ca_{cerberus_run}_annot.h5
 
-    ab: data/{species}/cerberus/{dataset}/ab.tsv
+    # TODO should switch this to only use the dataset name and stuff all the
+    # decrementing in a table somewhere?
+    ca_annot: data/{species}/cerberus/{dataset}/ca_{cerberus_run}_annot.h5
+
+    ab: data/{species}/cerberus/{dataset}/{cerberus_run}_ab.tsv
 
 sqanti_path: /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/
 cupcake_path: /dfs8/pub/freese//mortazavi_lab/bin/cDNA_Cupcake/
