@@ -221,7 +221,7 @@ rule get_gff_ab:
         mem_gb = 64,
         threads = 4
     output:
-        ab = config['data']['ab']
+        ab = temporary(config['data']['ab'])
     run:
         get_ab_from_gff(input.gff, output.ab)
 
@@ -468,7 +468,7 @@ rule format_tmerge_ab:
         mem_gb = 4,
         threads = 1
     output:
-        ab = config['data']['ab_fmt']
+        ab = temporary(config['data']['ab_fmt'])
     run:
         format_tmerge_ab(input.ab,
                          params.dataset,
