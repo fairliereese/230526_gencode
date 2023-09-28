@@ -97,3 +97,20 @@ def gff_fix_chr_names(gff_file, ofile, chr_map):
     df.rename({'fa_chr': 'Chromosome'}, axis=1, inplace=True)
     df = pr.PyRanges(df)
     df.to_gtf(ofile)
+
+def agg_cerb_abs(ab_files, ofile):
+    """
+    Put all abundance information from each sample in a
+    transcripts x samples matrix
+    """
+    merge_cols = ['annot_transcript_name',
+                  'annot_transcript_id',
+                  'transcript_ID']
+    for i, f in enumerate(ab_files):
+        temp = pd.read_csv(f, sep='\t')
+        if i == 0:
+            df = temp
+        else:
+            df = df.merge(temp, how='outer',
+                          on=merge_cols)
+    df.to_csv(ofile, sep='\t', index=False)

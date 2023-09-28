@@ -60,11 +60,13 @@ rule all:
         #        zip,
         #        species=species,
         #        dataset=datasets),
-        expand(config['data']['cerb']['ab'],
-               zip,
-               species=species,
-               dataset=datasets,
-               cerberus_run=cerberus_runs)
+        expand(config['data']['cerb']['agg_ab'],
+               species='human')
+        # expand(config['data']['cerb']['ab'],
+        #        zip,
+        #        species=species,
+        #        dataset=datasets,
+        #        cerberus_run=cerberus_runs)
         # expand(config['data']['cerb']['ca_annot'],
         #        zip,
         #        species=species,
@@ -495,3 +497,23 @@ use rule cerb_ab as study_cerb_ab with:
         agg = True
     output:
         ab = config['data']['cerb']['ab']
+
+def rule_get_all_cerb_ab(wc, df):
+    temp = df.loc[df.species==wc.species].copy(deep=True)
+    files = expand(expand(config['data']['cerb']['ab'],
+                   zip,
+                   dataset=temp.dataset.tolist(),
+                   cerberus_run=temp.cerberus_run.tolist(),
+                   allow_missing=True),
+                   species=wc.species)
+    return files
+
+rule agg_ab:
+    input:
+        abs = lambda wc:get_all_cerb_ab(wc, df)
+    resources:
+        mem_gb = 16,
+        threads = 2
+    output:
+        ab = config['data']['cerb']['agg_ab']
+    run:

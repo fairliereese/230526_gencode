@@ -58,6 +58,7 @@ data:
     ca_annot: data/{species}/cerberus/{dataset}/ca_{cerberus_run}_annot.h5
 
     ab: data/{species}/cerberus/{dataset}/{cerberus_run}_ab.tsv
+    agg_ab: data/{species}/cerberus/agg_ab.tsv
 
 sqanti_path: /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/
 cupcake_path: /dfs8/pub/freese//mortazavi_lab/bin/cDNA_Cupcake/
