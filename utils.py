@@ -104,13 +104,13 @@ def agg_cerb_abs(ab_files, ofile):
     transcripts x samples matrix
     """
     merge_cols = ['annot_transcript_name',
-                  'annot_transcript_id',
-                  'transcript_ID']
+                  'annot_transcript_id']
     for i, f in enumerate(ab_files):
         temp = pd.read_csv(f, sep='\t')
+        temp.drop('transcript_ID', axis=1, inplace=True)
         if i == 0:
             df = temp
         else:
             df = df.merge(temp, how='outer',
                           on=merge_cols)
-    df.to_csv(ofile, sep='\t', index=False)
+    df.to_csv(ofile, sep='\t', index=False  )

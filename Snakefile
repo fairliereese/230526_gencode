@@ -498,7 +498,7 @@ use rule cerb_ab as study_cerb_ab with:
     output:
         ab = config['data']['cerb']['ab']
 
-def rule_get_all_cerb_ab(wc, df):
+def get_all_cerb_ab(wc, df):
     temp = df.loc[df.species==wc.species].copy(deep=True)
     files = expand(expand(config['data']['cerb']['ab'],
                    zip,
@@ -517,3 +517,4 @@ rule agg_ab:
     output:
         ab = config['data']['cerb']['agg_ab']
     run:
+        agg_cerb_abs(input.abs, output.ab)
