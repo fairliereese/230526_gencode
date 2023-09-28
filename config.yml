@@ -44,6 +44,7 @@ data:
   ab_fmt: data/{species}/raw/{dataset}_abundance_formatted.tsv
 
   sqanti_gff: data/{species}/sqanti/{dataset}/{dataset}_sqanti_corrected.gtf.cds.gff
+  sqanti_gtf_filt: data/{species}/sqanti/{dataset}/{dataset}_sqanti_filtered.gtf.cds.gtf
 
   cerb:
     ends: data/{species}/cerberus/{dataset}/{end_mode}.bed

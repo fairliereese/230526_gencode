@@ -282,13 +282,25 @@ rule sqanti:
             -o {params.opref}
         """
 
+rule sqanti_filter:
+    input:
+        gff = config['data']['sqanti_gff']
+    resources:
+        mem_gb = 64,
+        threads = 2
+    output:
+        gtf = config['data']['sqanti_gtf_filt']
+    run:
+        rm_multi_gene_ts(input.gff, output.gtf)
+
+
 ################################################################################
 ############################## Cerberus ########################################
 ################################################################################
 
 use rule cerb_gtf_to_bed as data_cerb_gtf_to_bed with:
     input:
-        gtf = config['data']['sqanti_gff']
+        gtf = config['data']['sqanti_gtf_filt']
     output:
         ends = config['data']['cerb']['ends']
     params:
@@ -297,7 +309,7 @@ use rule cerb_gtf_to_bed as data_cerb_gtf_to_bed with:
 
 use rule cerb_gtf_to_ics as data_cerb_gtf_to_ics with:
     input:
-        gtf = config['data']['sqanti_gff']
+        gtf = config['data']['sqanti_gtf_filt']
     output:
         ics = config['data']['cerb']['ics']
 
@@ -453,7 +465,7 @@ def get_prev_ca_annot(wc):
 use rule cerb_annot as study_cerb_annot with:
     input:
         h5 = lambda wc: get_prev_ca_annot(wc),
-        gtf = config['data']['sqanti_gff']
+        gtf = config['data']['sqanti_gtf_filt']
     params:
         source = lambda wc:wc.dataset,
         gene_source = 'gencode'

@@ -73,8 +73,6 @@ def format_tmerge_ab(ab, dataset, metric, ofile):
     df.drop(['flrpm', 'rpm'], axis=1, inplace=True)
     df.to_csv(ofile, sep='\t', index=False)
 
-
-
 def gff_rm_sirv(gff_file, ofile):
     """
     Remove SIRV chromosomes from GFF file
@@ -95,6 +93,18 @@ def gff_fix_chr_names(gff_file, ofile, chr_map):
                   right_on='gff_chr')
     df.drop(['Chromosome', 'gff_chr'], axis=1, inplace=True)
     df.rename({'fa_chr': 'Chromosome'}, axis=1, inplace=True)
+    df = pr.PyRanges(df)
+    df.fillna(0, inplace=True)
+    df.to_gtf(ofile)
+
+def rm_multi_gene_ts(gff, ofile):
+    """
+    Remove transcripts from SQANTI GFF that matched with multiple genes.
+    These are few in number (~10%)
+    """
+    df = pr.read_gff(gff_file).as_df()
+    df['gene_count'] = df.gene_id.str.count('_')
+    df = df.loc[df.gene_count == 1]
     df = pr.PyRanges(df)
     df.to_gtf(ofile)
 
