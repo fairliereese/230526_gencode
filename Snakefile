@@ -445,26 +445,36 @@ use rule cerb_annot as ref_cerb_annot with:
     output:
         h5 = config['ref']['ca_annot']
 
-def get_prev_ca_annot(wc):
-    # TODO - modify to work w/ multiple species
-    if int(wc.cerberus_run) == 1:
-        ca = expand(config['ref']['ca_annot'],
-                    zip,
-                    species=wc.species)[0]
-    else:
-        prev_run = int(wc.cerberus_run)-1
-        prev_run_ind = prev_run - 1
-        prev_dataset = datasets[prev_run_ind]
-        ca = expand(config['data']['cerb']['ca_annot'],
-                    zip,
-                    dataset=prev_dataset,
-                    cerberus_run=prev_run,
-                    species=wc.species)[0]
-    return ca
+# def get_prev_ca_annot(wc):
+#     # TODO - modify to work w/ multiple species
+#     if int(wc.cerberus_run) == 1:
+#         ca = expand(config['ref']['ca_annot'],
+#                     zip,
+#                     species=wc.species)[0]
+#     else:
+#         prev_run = int(wc.cerberus_run)-1
+#         prev_run_ind = prev_run - 1
+#         prev_dataset = datasets[prev_run_ind]
+#         ca = expand(config['data']['cerb']['ca_annot'],
+#                     zip,
+#                     dataset=prev_dataset,
+#                     cerberus_run=prev_run,
+#                     species=wc.species)[0]
+#     return ca
+
+# use rule cerb_annot as study_cerb_annot with:
+#     input:
+#         h5 = lambda wc: get_prev_ca_annot(wc),
+#         gtf = config['data']['sqanti_gtf_filt']
+#     params:
+#         source = lambda wc:wc.dataset,
+#         gene_source = 'gencode'
+#     output:
+#         h5 = config['data']['cerb']['ca_annot']
 
 use rule cerb_annot as study_cerb_annot with:
     input:
-        h5 = lambda wc: get_prev_ca_annot(wc),
+        h5 = config['ref']['ca_annot']
         gtf = config['data']['sqanti_gtf_filt']
     params:
         source = lambda wc:wc.dataset,
