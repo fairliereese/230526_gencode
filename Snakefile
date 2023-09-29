@@ -474,7 +474,7 @@ use rule cerb_annot as ref_cerb_annot with:
 
 use rule cerb_annot as study_cerb_annot with:
     input:
-        h5 = config['ref']['ca_annot']
+        h5 = config['ref']['ca_annot'],
         gtf = config['data']['sqanti_gtf_filt']
     params:
         source = lambda wc:wc.dataset,

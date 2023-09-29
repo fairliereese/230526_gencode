@@ -102,7 +102,7 @@ def rm_multi_gene_ts(gff, ofile):
     Remove transcripts from SQANTI GFF that matched with multiple genes.
     These are few in number (~10%)
     """
-    df = pr.read_gff(gff_file).as_df()
+    df = pr.read_gff(gff).as_df()
     df['gene_count'] = df.gene_id.str.count('_')
     df = df.loc[df.gene_count == 1]
     df = pr.PyRanges(df)
