@@ -545,11 +545,12 @@ rule agg_ab:
 
 def get_all_ca_annots(wc, df):
     temp = df.loc[df.species==wc.species].copy(deep=True)
-    annots = expand(expand(zip,
-                           dataset=temp.dataset.tolist(),
-                           cerberus_run=temp.cerberus_run.tolist(),
-                           allow_missing=True),
-                           species=wc.species)
+    expand(expand(config['data']['cerb']['ca_annot'],
+                       zip,
+                       dataset=temp.dataset.tolist(),
+                       cerberus_run=temp.cerberus_run.tolist(),
+                       allow_missing=True),
+                       species=wc.species)
     return annots
 
 rule cerb_agg_annots:
