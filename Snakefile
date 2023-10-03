@@ -62,7 +62,7 @@ rule all:
         #        dataset=datasets),
         expand(config['data']['cerb']['agg_ab'],
                species='human'),
-        expand(config['cerb']['ca_all'],
+        expand(config['data']['cerb']['ca_all'],
                species='human')
         # expand(config['data']['cerb']['ab'],
         #        zip,
@@ -559,7 +559,7 @@ rule cerb_agg_annots:
         mem_gb = 16,
         threads = 2
     output:
-        h5 = config['cerb']['ca_all']
+        h5 = config['data']['cerb']['ca_all']
     run:
         for i,a in enumerate(annots):
             if i == 0:
