@@ -61,6 +61,8 @@ rule all:
         #        species=species,
         #        dataset=datasets),
         expand(config['data']['cerb']['agg_ab'],
+               species='human'),
+        expand(config['cerb']['ca_all'],
                species='human')
         # expand(config['data']['cerb']['ab'],
         #        zip,
@@ -540,3 +542,29 @@ rule agg_ab:
         ab = config['data']['cerb']['agg_ab']
     run:
         agg_cerb_abs(input.abs, output.ab)
+
+def get_all_ca_annots(wc, df):
+    temp = df.loc[df.species==wc.species].copy(deep=True)
+    annots = expand(expand(zip,
+                           dataset=temp.dataset.tolist(),
+                           cerberus_run=temp.cerberus_run.tolist(),
+                           allow_missing=True),
+                           species=wc.species)
+    return annots
+
+rule cerb_agg_annots:
+    input:
+        annots = lambda wc:get_all_ca_annots(wc, df)
+    resources:
+        mem_gb = 16,
+        threads = 2
+    output:
+        h5 = config['cerb']['ca_all']
+    run:
+        for i,a in enumerate(annots):
+            if i == 0:
+                ca = cerberus.read(a)
+            else:
+                temp = cerberus.read(a)
+                ca.t_map = pd.concat([ca.t_map, temp.t_map], axis=0)
+        ca.write(output.h5)
