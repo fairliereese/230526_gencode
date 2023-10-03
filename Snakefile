@@ -555,14 +555,14 @@ def get_all_ca_annots(wc, df):
 
 rule cerb_agg_annots:
     input:
-        annots = lambda wc:get_all_ca_annots(wc, df)
+        cas = lambda wc:get_all_ca_annots(wc, df)
     resources:
         mem_gb = 16,
         threads = 2
     output:
         h5 = config['data']['cerb']['ca_all']
     run:
-        for i,a in enumerate(annots):
+        for i,a in enumerate(input.cas):
             if i == 0:
                 ca = cerberus.read(a)
             else:
