@@ -557,7 +557,7 @@ rule cerb_agg_annots:
     input:
         cas = lambda wc:get_all_ca_annots(wc, df)
     resources:
-        mem_gb = 16,
+        mem_gb = 64,
         threads = 2
     output:
         h5 = config['data']['cerb']['ca_all']
