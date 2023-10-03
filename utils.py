@@ -124,3 +124,39 @@ def agg_cerb_abs(ab_files, ofile):
             df = df.merge(temp, how='outer',
                           on=merge_cols)
     df.to_csv(ofile, sep='\t', index=False  )
+
+def calculate_triplets(h5, ab, min_tpm, ofile, novel_genes=False):
+    """
+    Calculate triplets for genes based on expressed transcripts
+
+    Parameters:
+        h5 (str): Path to cerberus h5
+        ab (str): Path to abundance matrix
+        min_tpm (float): Min tpm for a transcript to be expressed
+        ofile (str): Path to output cerberus h5
+        novel_genes (bool): Keep novel genes. Default = Falses
+    """
+    # read in abundance
+    df = pd.read_csv(ab, sep='\t')
+    df = df.fillna(0)
+
+    # read in cerberus annot
+    ca = cerberus.read(h5)
+
+    # remove novel genes?
+    if not novel_genes:
+        df = df.loc[~(df.annot_transcript_id.str.contains('novelGene'))]
+
+    # determine whether each transcript is detected
+    df.set_index(['annot_transcript_id', 'annot_transcript_name'], inplace=True)
+    df = df >= min_tpm
+
+    # loop through thing
+    for c in df.columns.tolist():
+        temp = df.loc[df[c] == True].copy(deep=True)
+        temp.reset_index(inplace=True)
+        tids = temp.annot_transcript_id.tolist()
+        triplets = ca.get_subset_triplets(tids, c)
+        ca.add_triplets(triplets)
+
+    ca.write(ofile)

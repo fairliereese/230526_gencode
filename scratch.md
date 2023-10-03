@@ -66,15 +66,15 @@ mkdir -p data/mouse
         python /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/sqanti3_qc.py             data/mouse/ESC_Embryo_pacBioSII_pre-capture_mouse_all_no_sirv.gff             ref/mouse/annot.gtf             ref/mouse/ref.fa             -d data/mouse --force_id_ignore             --aligner_choice minimap2             --skipORF             -o ESC_Embryo_pacBioSII_pre-capture_mouse_all_sqanti
 
 mkdir -p data/mouse
-        python /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/sqanti3_qc.py \
-        data/mouse/ESC_Embryo_pacBioSII_post-capture_mouse_all_no_sirv.gff \
-        ref/mouse/annot.gtf \
-        ref/mouse/ref.fa \
-        -d data/mouse \
-        --force_id_ignore \
-        --aligner_choice minimap2 \
-        --skipORF \
-        -o ESC_Embryo_pacBioSII_post-capture_mouse_all_sqanti
+python /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/sqanti3_qc.py \
+  data/mouse/ESC_Embryo_pacBioSII_post-capture_mouse_all_no_sirv.gff \
+  ref/mouse/annot.gtf \
+  ref/mouse/ref.fa \
+  -d data/mouse \
+  --force_id_ignore \
+  --aligner_choice minimap2 \
+  --skipORF \
+  -o ESC_Embryo_pacBioSII_post-capture_mouse_all_sqanti
 ```
 
 ```bash

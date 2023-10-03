@@ -60,9 +60,12 @@ rule all:
         #        zip,
         #        species=species,
         #        dataset=datasets),
-        expand(config['data']['cerb']['agg_ab'],
-               species='human'),
-        expand(config['data']['cerb']['ca_all'],
+        # expand(config['data']['cerb']['agg_ab'],
+        #        species='human'),
+        # expand(config['data']['cerb']['ca_all'],
+        #        species='human')
+        expand(config['data']['cerb']['ca_trip'],
+               zip,
                species='human')
         # expand(config['data']['cerb']['ab'],
         #        zip,
@@ -543,29 +546,59 @@ rule agg_ab:
     run:
         agg_cerb_abs(input.abs, output.ab)
 
-def get_all_ca_annots(wc, df):
+def get_last_ca_annot(wc, df):
     temp = df.loc[df.species==wc.species].copy(deep=True)
-    annots = expand(expand(config['data']['cerb']['ca_annot'],
-                       zip,
-                       dataset=temp.dataset.tolist(),
-                       cerberus_run=temp.cerberus_run.tolist(),
-                       allow_missing=True),
-                       species=wc.species)
-    return annots
+    cerberus_run = temp.cerberus_run.max()
+    dataset = temp.loc[temp.cerberus_run==cerberus_run, 'dataset'].values[0]
+    annot = expand(config['data']['cerb']['ca_annot'],
+                   zip,
+                   species=wc.species,
+                   dataset=dataset,
+                   cerberus_run=cerberus_run)
+    assert len(annot) == 0
+    return annot[0]
 
-rule cerb_agg_annots:
+rule cerb_calc_triplets:
     input:
-        cas = lambda wc:get_all_ca_annots(wc, df)
+        h5 = lambda wc:get_last_ca_annot(wc, df),
+        ab = config['data']['cerb']['agg_ab']
     resources:
         mem_gb = 64,
         threads = 2
+    params:
+        min_tpm = 1
     output:
-        h5 = config['data']['cerb']['ca_all']
+        h5 = config['data']['cerb']['ca_trip']
     run:
-        for i,a in enumerate(input.cas):
-            if i == 0:
-                ca = cerberus.read(a)
-            else:
-                temp = cerberus.read(a)
-                ca.t_map = pd.concat([ca.t_map, temp.t_map], axis=0)
-        ca.write(output.h5)
+        calculate_triplets(input.h5,
+                           input.ab,
+                           params.min_tpm,
+                           output.h5)
+
+
+# def get_all_ca_annots(wc, df):
+#     temp = df.loc[df.species==wc.species].copy(deep=True)
+#     annots = expand(expand(config['data']['cerb']['ca_annot'],
+#                        zip,
+#                        dataset=temp.dataset.tolist(),
+#                        cerberus_run=temp.cerberus_run.tolist(),
+#                        allow_missing=True),
+#                        species=wc.species)
+#     return annots
+#
+# rule cerb_agg_annots:
+#     input:
+#         cas = lambda wc:get_all_ca_annots(wc, df)
+#     resources:
+#         mem_gb = 64,
+#         threads = 2
+#     output:
+#         h5 = config['data']['cerb']['ca_all']
+#     run:
+#         for i,a in enumerate(input.cas):
+#             if i == 0:
+#                 ca = cerberus.read(a)
+#             else:
+#                 temp = cerberus.read(a)
+#                 ca.t_map = pd.concat([ca.t_map, temp.t_map], axis=0)
+#         ca.write(output.h5)
