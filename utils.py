@@ -3,6 +3,7 @@ import numpy as np
 from snakemake.io import expand
 import pyranges as pr
 import os
+import cerberus
 
 
 def get_dataset_df_col(wc, df, col):
@@ -103,7 +104,7 @@ def rm_multi_gene_ts(gff, ofile):
     These are few in number (~10%)
     """
     df = pr.read_gff(gff).as_df()
-    df['gene_count'] = df.gene_id.str.count('_')
+    df['gene_count'] = df.gene_id.str.count('_')+1
     df = df.loc[df.gene_count == 1]
     df = pr.PyRanges(df)
     df.to_gtf(ofile)

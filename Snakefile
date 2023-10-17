@@ -555,7 +555,7 @@ def get_last_ca_annot(wc, df):
                    species=wc.species,
                    dataset=dataset,
                    cerberus_run=cerberus_run)
-    assert len(annot) == 0
+    assert len(annot) == 1
     return annot[0]
 
 rule cerb_calc_triplets:
