@@ -5,6 +5,144 @@ import pyranges as pr
 import os
 import cerberus
 
+def assign_sector(df):
+    df['sector'] = 'simple'
+
+    df.loc[df.tss_ratio > 0.5, 'sector'] = 'tss'
+    df.loc[df.tes_ratio > 0.5, 'sector'] = 'tes'
+    df.loc[df.spl_ratio > 0.5, 'sector'] = 'splicing'
+
+    # mixed genes
+    df.loc[(df.sector=='simple')&(df.n_iso>1), 'sector'] = 'mixed'
+
+    return df
+
+def get_centroids(ca,
+                  source='sample_det',
+                  ver=None,
+                  **kwargs):
+
+    # subset on source
+    df = ca.triplets.loc[ca.triplets.source == source].copy(deep=True)
+
+    # limit only to columns that are important
+    keep_cols = ['gname', 'gid',
+                 'n_tss', 'n_tes', 'n_ic', 'splicing_ratio',
+                 'tss_ratio', 'tes_ratio', 'spl_ratio',
+                 'n_iso']
+    df = df[keep_cols]
+
+    # get centroid
+    df = df.groupby(['gname', 'gid']).mean().reset_index()
+    df = assign_sector(df)
+
+    # add the centroids to the ca.triplet
+    df['source'] = source+'_centroid'
+    ca.triplets = pd.concat([ca.triplets, df], axis=0)
+
+    return ca
+
+def compute_dists(cas,
+                  sources,
+                  gene_merge=['gname', 'gid'],
+                  rm_1_isos=[False, False],
+                  gene_subsets=[None, None],
+                  ver=[None, None]):
+    """
+    Compute the distance between source1 and source2.
+    Also compute the Z-score.
+    """
+
+    def preproc_ca(ca,
+                   source,
+                   rm_1_iso,
+                   gene_subset,
+                   ver):
+        """
+        Preprocess cerberus annot according to input settings
+        """
+
+        # get triplets for source
+        df = ca.triplets.loc[ca.triplets.source == source].copy(deep=True)
+
+        # if requested, remove triplets w/ only 1 isoform
+        if rm_1_iso:
+            df = df.loc[df.n_iso > 1]
+
+        # limit to target genes
+        if gene_subset:
+            gene_df, _, _ = get_gtf_info(how='gene',
+                                         ver=ver,
+                                         add_stable_gid=True)
+            gene_df = gene_df[['gid_stable', 'biotype']]
+            df = df.merge(gene_df, how='left',
+                            left_on='gid', right_on='gid_stable')
+            df = df.loc[df.biotype==gene_subset]
+
+        return df
+
+    if len(cas) > 2:
+        print('Can only compute dists for 2 cerberus annots')
+        return None
+
+    dfs = []
+    for i in range(len(cas)):
+        dfs.append(preproc_ca(cas[i],
+                               sources[i],
+                               rm_1_isos[i],
+                               gene_subsets[i],
+                               ver[i]))
+
+
+
+
+
+#     # get triplets for each source
+#     df1 = ca.triplets.loc[ca.triplets.source == source1].copy(deep=True)
+#     df2 = ca.triplets.loc[ca.triplets.source == source2].copy(deep=True)
+
+#     # if requested, remove triplets w/ only one isoform
+#     if rm_1_iso_1:
+#         df1 = df1.loc[df1.n_iso > 1]
+#     if rm_1_iso_2:
+#         df2 = df2.loc[df2.n_iso > 1]
+
+#     # limit to target genes
+#     if gene_subset:
+#         gene_df, _, _ = get_gtf_info(how='gene',
+#                                      ver=ver,
+#                                      add_stable_gid=True)
+#         gene_df = gene_df[['gid_stable', 'biotype']]
+
+#         # df1
+#         df1 = df1.merge(gene_df, how='left',
+#                         left_on='gid', right_on='gid_stable')
+#         df1 = df1.loc[df1.biotype==gene_subset]
+
+#         # df2
+#         df2 = df2.merge(gene_df, how='left',
+#                         left_on='gid', right_on='gid_stable')
+#         df2 = df2.loc[df2.biotype==gene_subset]
+
+    # merge dfs on gene info
+    df = dfs[0].merge(dfs[1], how='inner',
+                      on=gene_merge,
+                      suffixes=(f'_{sources[0]}', f'_{sources[1]}'))
+
+    # compute distances
+    # pandarallel.initialize(nb_workers=8, verbose=1)
+    df['dist'] = df.apply(simplex_dist,
+                           args=(f'_{sources[0]}',
+                                 f'_{sources[1]}'),
+                           axis=1)
+    df.dist = df.dist.fillna(0)
+
+    # compute z_scores
+    df['z_score'] = st.zscore(df.dist.tolist())
+
+    return df
+
+
 
 def get_dataset_df_col(wc, df, col):
     val = df.loc[df.dataset==wc.dataset, col].values[0]
