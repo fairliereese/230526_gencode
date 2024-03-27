@@ -37,8 +37,11 @@ ref:
 
 data:
   meta: data/{species}/metadata.tsv
+  artifact_gz: data/artifacts.gz
+  artifact: data/artifacts.txt
   gff_gz: data/{species}/raw/{dataset}.gff.gz
   gff: data/{species}/raw/{dataset}.gff
+  gtf_filt:  data/{species}/raw/{dataset}_filt.gff
   gtf_no_sirv: data/{species}/raw/{dataset}_no_sirv.gff
   ab: data/{species}/raw/{dataset}_abundance.tsv
   ab_fmt: data/{species}/raw/{dataset}_abundance_formatted.tsv

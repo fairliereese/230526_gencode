@@ -37,6 +37,9 @@ wildcard_constraints:
 
 rule all:
     input:
+        expand(config['data']['cerb']['ca_trip'],
+               zip,
+               species='mouse')
         # 'beep_env.out'
         # expand(expand(config['data']['cerb']['ends'],
         #     zip,
@@ -64,9 +67,6 @@ rule all:
         #        species='human'),
         # expand(config['data']['cerb']['ca_all'],
         #        species='human')
-        expand(config['data']['cerb']['ca_trip'],
-               zip,
-               species='mouse')
         # expand(config['data']['cerb']['ab'],
         #        zip,
         #        species=species,
@@ -133,6 +133,20 @@ use rule gunzip as gunzip_gff with:
         gz = config['data']['gff_gz']
     output:
         out = config['data']['gff']
+
+use rule dl_pass as dl_art with:
+    params:
+        link = 'https://public-docs.crg.es/rguigo/Data/gkaur/LyRic_CLS3_TM_perTissue/LyRicTMs_artifacts.gz'
+        user = 'user_cls',
+        pwd = 'Gencode@CLS_2022'
+    output:
+        out = config['data']['artifact_gz']
+
+use rule gunzip as gunzip_gff with:
+    input:
+        gz = config['data']['artifact_gz']
+    output:
+        out = config['data']['artifact']
 
 use rule dl as dl_annot with:
     params:
@@ -232,9 +246,30 @@ rule get_gff_ab:
     run:
         get_ab_from_gff(input.gff, output.ab)
 
+rule rm_artifcats:
+    input:
+        artifacts = config['data']['artifact'],
+        gff = config['data']['gff'],
+    resources:
+        threads = 1,
+        mem_gb = 64
+    output:
+        gtf = config['data']['gtf_filt']
+    run:
+        df = pd.read_csv(input.artifacts, header=None)
+        df.columns = ['tid']
+        bad_tids = df.tid.tolist()
+
+        df = pr.read_gff(input.gff).as_df
+        df = df.loc[~df.transcript_id.isin(bad_tids)]
+        df = pr.PyRanges(df)
+        df.to_gtf(output.gtf)
+
+
+
 rule rm_sirv:
     input:
-        gff = config['data']['gff']
+        gff = config['data']['gtf_filt']
     params:
         chr_map = config['ref']['chr_map']
     resources:
@@ -248,7 +283,6 @@ rule rm_sirv:
 
         if wildcards.species=='human':
             gff_fix_chr_names(output.gtf, output.gtf, params.chr_map)
-
 
 ################################################################################
 ################################# SQANTI #######################################

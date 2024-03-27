@@ -216,7 +216,7 @@ def gff_rm_sirv(gff_file, ofile):
     """
     Remove SIRV chromosomes from GFF file
     """
-    df = pr.read_gff(gff_file).as_df()
+    df = pr.read_gtf(gff_file).as_df()
     df = df.loc[df.Chromosome!='SIRVome_isoforms']
     df = pr.PyRanges(df)
     df.to_gtf(ofile)
