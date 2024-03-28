@@ -10,7 +10,7 @@ configfile: 'config.yml'
 end_types = ['tss', 'tes']
 
 # data config
-config_fname = '230614_config.tsv'
+config_fname = '240327_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
