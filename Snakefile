@@ -142,7 +142,7 @@ use rule dl_pass as dl_art with:
     output:
         out = config['data']['artifact_gz']
 
-use rule gunzip as gunzip_gff with:
+use rule gunzip as gunzip_artifact with:
     input:
         gz = config['data']['artifact_gz']
     output:
