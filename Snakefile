@@ -136,7 +136,7 @@ use rule gunzip as gunzip_gff with:
 
 use rule dl_pass as dl_art with:
     params:
-        link = 'https://public-docs.crg.es/rguigo/Data/gkaur/LyRic_CLS3_TM_perTissue/LyRicTMs_artifacts.gz'
+        link = 'https://public-docs.crg.es/rguigo/Data/gkaur/LyRic_CLS3_TM_perTissue/LyRicTMs_artifacts.gz',
         user = 'user_cls',
         pwd = 'Gencode@CLS_2022'
     output:
