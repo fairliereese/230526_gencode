@@ -126,7 +126,7 @@ use rule dl_pass as dl_gff with:
         user = 'user_cls',
         pwd = 'Gencode@CLS_2022'
     output:
-        out = config['data']['gff_gz']
+        out = temporary(config['data']['gff_gz'])
 
 use rule gunzip as gunzip_gff with:
     input:
@@ -152,13 +152,13 @@ use rule dl as dl_annot with:
     params:
         link = lambda wc: config['ref'][wc.species]['annot_link']
     output:
-        out = config['ref']['annot_gz']
+        out = temporary(config['ref']['annot_gz'])
 
 use rule dl as dl_fa with:
     params:
         link = lambda wc: config['ref'][wc.species]['fa_link']
     output:
-        out = config['ref']['fa_gz']
+        out = temporary(config['ref']['fa_gz'])
 
 use rule gunzip as gunzip_annot with:
     input:
