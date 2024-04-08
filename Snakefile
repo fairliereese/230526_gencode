@@ -49,7 +49,7 @@ rule all:
         expand(config['data']['cerb']['ics'],
                 zip,
                 species=species,
-                dataset=datasets)
+                dataset=datasets),
         expand(config['data']['cerb']['ca_ref'],
                zip,
                species=species)
