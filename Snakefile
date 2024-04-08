@@ -129,13 +129,13 @@ rule gunzip:
     shell:
         "gunzip -c {input.gz} > {output.out}"
 
-use rule dl_pass as dl_gff with:
-    params:
-        link = lambda wc: get_dataset_df_col(wc, df, 'link'),
-        user = 'user_cls',
-        pwd = 'Gencode@CLS_2022'
-    output:
-        out = config['data']['gff_gz']
+# use rule dl_pass as dl_gff with:
+#     params:
+#         link = lambda wc: get_dataset_df_col(wc, df, 'link'),
+#         user = 'user_cls',
+#         pwd = 'Gencode@CLS_2022'
+#     output:
+#         out = config['data']['gff_gz']
 
 use rule gunzip as gunzip_gff with:
     input:
@@ -143,13 +143,13 @@ use rule gunzip as gunzip_gff with:
     output:
         out = config['data']['gff']
 
-use rule dl_pass as dl_art with:
-    params:
-        link = 'https://public-docs.crg.es/rguigo/Data/gkaur/LyRic_CLS3_TM_perTissue/LyRicTMs_artifacts.gz',
-        user = 'user_cls',
-        pwd = 'Gencode@CLS_2022'
-    output:
-        out = config['data']['artifact_gz']
+# use rule dl_pass as dl_art with:
+#     params:
+#         link = 'https://public-docs.crg.es/rguigo/Data/gkaur/LyRic_CLS3_TM_perTissue/LyRicTMs_artifacts.gz',
+#         user = 'user_cls',
+#         pwd = 'Gencode@CLS_2022'
+#     output:
+#         out = config['data']['artifact_gz']
 
 use rule gunzip as gunzip_artifact with:
     input:
