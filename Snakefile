@@ -39,7 +39,7 @@ rule all:
     input:
         expand(config['data']['cerb']['ca_trip'],
                zip,
-               species='mouse'),
+               species='human'),
         # expand(expand(config['data']['cerb']['ends'],
         #     zip,
         #     species=species,
