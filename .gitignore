@@ -1,2 +1,7 @@
+*.ipynb_checkpoints/*
+*.snakemake/*
+*__pycache__*
+*h5
+data/*
 *abundance*tsv
 *.gff*

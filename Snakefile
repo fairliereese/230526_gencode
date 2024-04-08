@@ -14,8 +14,8 @@ config_fname = '240327_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
-df = df.loc[df.species == 'mouse']
-# df = df.loc[df.species == 'human']
+# df = df.loc[df.species == 'mouse']
+df = df.loc[df.species == 'human']
 
 datasets = df.dataset.tolist()
 species = df.species.tolist()
@@ -36,51 +36,60 @@ wildcard_constraints:
     dataset= '|'.join([re.escape(x) for x in datasets]),
 
 rule all:
-    input:
-        expand(config['data']['cerb']['ca_trip'],
-               zip,
-               species='mouse')
-        # 'beep_env.out'
-        # expand(expand(config['data']['cerb']['ends'],
-        #     zip,
-        #     species=species,
-        #     dataset=datasets,
-        #     allow_missing=True),
-        #     end_mode=end_types),
-        # expand(config['data']['cerb']['ics'],
-        #         zip,
-        #         species=species,
-        #         dataset=datasets)
-        # expand(config['data']['cerb']['ca_ref'],
-        #        zip,
-        #        species=species)
-        # expand(config['data']['cerb']['ca_annot'],
-        #        zip,
-        #        species=species,
-        #        dataset=datasets[-1],
-        #        cerberus_run=cerberus_runs)
-        # expand(config['data']['ab'],
-        #        zip,
-        #        species=species,
-        #        dataset=datasets),
-        # expand(config['data']['cerb']['agg_ab'],
-        #        species='human'),
-        # expand(config['data']['cerb']['ca_all'],
-        #        species='human')
-        # expand(config['data']['cerb']['ab'],
-        #        zip,
-        #        species=species,
-        #        dataset=datasets,
-        #        cerberus_run=cerberus_runs)
-        # expand(config['data']['cerb']['ca_annot'],
-        #        zip,
-        #        species=species,
-        #        dataset=datasets[-1],
-        #        cerberus_run=cerberus_runs[-1]),
-        # expand(config['data']['gtf_no_sirv'],
-        #        zip,
-        #        species=species[0],
-        #        dataset=datasets[0])
+    expand(config['data']['cerb']['ca_trip'],
+           zip,
+           species='mouse')
+    'beep_env.out'
+    expand(expand(config['data']['cerb']['ends'],
+        zip,
+        species=species,
+        dataset=datasets,
+        allow_missing=True),
+        end_mode=end_types),
+    expand(config['data']['cerb']['ics'],
+            zip,
+            species=species,
+            dataset=datasets)
+    expand(config['data']['cerb']['ca_ref'],
+           zip,
+           species=species)
+    expand(config['data']['cerb']['ca_annot'],
+           zip,
+           species=species,
+           dataset=datasets[-1],
+           cerberus_run=cerberus_runs)
+    expand(config['data']['ab'],
+           zip,
+           species=species,
+           dataset=datasets),
+    expand(config['data']['cerb']['agg_ab'],
+           species='human'),
+    expand(config['data']['cerb']['ca_all'],
+           species='human')
+    expand(config['data']['cerb']['ab'],
+           zip,
+           species=species,
+           dataset=datasets,
+           cerberus_run=cerberus_runs)
+    expand(config['data']['cerb']['ca_annot'],
+           zip,
+           species=species,
+           dataset=datasets[-1],
+           cerberus_run=cerberus_runs[-1]),
+    expand(config['data']['gtf_no_sirv'],
+           zip,
+           species=species[0],
+           dataset=datasets[0])
+    # input:
+    #     expand(config['data']['gff_gz'],
+    #            zip,
+    #            species=species,
+    #            dataset=datasets),
+    #     expand(config['data']['artifact_gz'],
+    #           zip,
+    #           species=species,
+    #           dataset=datasets),
+
 
 # rule debug_envs:
 #     conda:
@@ -126,7 +135,7 @@ use rule dl_pass as dl_gff with:
         user = 'user_cls',
         pwd = 'Gencode@CLS_2022'
     output:
-        out = temporary(config['data']['gff_gz'])
+        out = config['data']['gff_gz']
 
 use rule gunzip as gunzip_gff with:
     input:
