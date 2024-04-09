@@ -453,7 +453,7 @@ rule cerb_agg_ics:
     input:
        files = lambda wc:get_agg_settings(wc, 'file'),
        cfg = config['data']['cerb']['agg_ics_cfg']
-     resources:
+    resources:
         threads = 16,
         mem_gb = 128
     output:
