@@ -269,7 +269,7 @@ rule rm_artifcats:
         df.columns = ['tid']
         bad_tids = df.tid.tolist()
 
-        df = pr.read_gff(input.gff).as_df
+        df = pr.read_gff(input.gff).as_df()
         df = df.loc[~df.transcript_id.isin(bad_tids)]
         df = pr.PyRanges(df)
         df.to_gtf(output.gtf)
