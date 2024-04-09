@@ -66,5 +66,5 @@ data:
 
     ca_trip: data/{species}/cerberus/ca_trip.h5
 
-sqanti_path: /dfs8/pub/freese//mortazavi_lab/bin/SQANTI3/
-cupcake_path: /dfs8/pub/freese//mortazavi_lab/bin/cDNA_Cupcake/
+sqanti_path: /dfs6/pub/freese/mortazavi_lab/bin/SQANTI3/
+cupcake_path: /dfs6/pub/freese/mortazavi_lab/bin/cDNA_Cupcake/
