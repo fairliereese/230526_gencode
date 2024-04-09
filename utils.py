@@ -232,8 +232,9 @@ def gff_fix_chr_names(gff_file, ofile, chr_map):
                   right_on='gff_chr')
     df.drop(['Chromosome', 'gff_chr'], axis=1, inplace=True)
     df.rename({'fa_chr': 'Chromosome'}, axis=1, inplace=True)
-    df = pr.PyRanges(df)
     df.fillna(0, inplace=True)
+    
+    df = pr.PyRanges(df)
     df.to_gtf(ofile)
 
 def rm_multi_gene_ts(gff, ofile):
