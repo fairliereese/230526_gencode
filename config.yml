@@ -53,6 +53,7 @@ data:
     ends: data/{species}/cerberus/{dataset}/{end_mode}.bed
     ics: data/{species}/cerberus/{dataset}/ics.tsv
     agg_ends: data/{species}/cerberus/agg_{end_mode}.bed
+    agg_ics_cfg: data/{species}/cerberus/agg_ics_cfg.tsv
     agg_ics: data/{species}/cerberus/agg_ics.tsv
 
     ca_ref: data/{species}/cerberus/ca_ref.h5
