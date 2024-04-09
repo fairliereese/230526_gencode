@@ -442,7 +442,7 @@ rule cerb_agg_ics_cfg:
         cfg = config['data']['cerb']['agg_ics_cfg']
     run:
         df = pd.DataFrame()
-        df['fname'] = input.files
+        df['fname'] = list(input.files)
         refs = [params.refs for i in range(len(input.files))]
         refs[0] = True
         df['ref'] = refs
