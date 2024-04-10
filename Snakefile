@@ -14,8 +14,8 @@ config_fname = '240327_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
-# df = df.loc[df.species == 'mouse']
-df = df.loc[df.species == 'human']
+df = df.loc[df.species == 'mouse']
+# df = df.loc[df.species == 'human']
 
 datasets = df.dataset.tolist()
 species = df.species.tolist()
