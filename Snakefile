@@ -38,7 +38,7 @@ wildcard_constraints:
 
 rule all:
     input:
-        expand(config['data']['cerb']['ca_trip'],
+        expand(config['data']['cerb']['trip'],
                zip,
                species=species),
         # expand(expand(config['data']['cerb']['ends'],
@@ -655,6 +655,18 @@ rule cerb_calc_triplets:
                            params.min_tpm,
                            output.h5)
 
+rule ca_trip to trip:
+    input:
+        h5 = config['data']['cerb']['ca_trip']
+    resources:
+        mem_gb = 16,
+        threads = 1
+    output:
+        tsv = config['data']['cerb']['trip']
+    run:
+        ca = cerberus.read(input.h5)
+        trip = ca.triplets
+        trip.to_csv(output.tsv, sep='\t')
 
 # def get_all_ca_annots(wc, df):
 #     temp = df.loc[df.species==wc.species].copy(deep=True)
