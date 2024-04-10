@@ -14,7 +14,8 @@ config_fname = '240327_config.tsv'
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
-df = df.loc[df.species == 'mouse']
+species = 'mouse'
+df = df.loc[df.species == species]
 # df = df.loc[df.species == 'human']
 
 datasets = df.dataset.tolist()
@@ -39,7 +40,7 @@ rule all:
     input:
         expand(config['data']['cerb']['ca_trip'],
                zip,
-               species='human'),
+               species=species),
         # expand(expand(config['data']['cerb']['ends'],
         #     zip,
         #     species=species,
