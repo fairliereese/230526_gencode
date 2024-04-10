@@ -66,6 +66,7 @@ data:
     agg_ab: data/{species}/cerberus/agg_ab.tsv
 
     ca_trip: data/{species}/cerberus/ca_trip.h5
+    trip: data/{species}/cerberus/triplets.tsv
 
 sqanti_path: /dfs6/pub/freese/mortazavi_lab/bin/SQANTI3/
 cupcake_path: /dfs6/pub/freese/mortazavi_lab/bin/cDNA_Cupcake/
