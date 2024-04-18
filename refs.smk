@@ -116,13 +116,13 @@ def get_transcript_info(gtf, tf_file, o):
     # merge mane info
     df = df.merge(mane_df, how='left', on='tid')
 
-    # add TF info
-    df['tf'] = False
-    tf_df = pd.read_csv(tf_file, sep='\t')
-    tf_gids = tf_df['Gene stable ID'].unique().tolist()
-    df['gid_stable'] = df['gid'].str.split('.', expand=True)[0]
-    df.loc[df.gid_stable.isin(tf_gids), 'tf'] = True
-    df.drop('gid_stable', axis=1, inplace=True)
+    # # add TF info
+    # df['tf'] = False
+    # tf_df = pd.read_csv(tf_file, sep='\t')
+    # tf_gids = tf_df['Gene stable ID'].unique().tolist()
+    # df['gid_stable'] = df['gid'].str.split('.', expand=True)[0]
+    # df.loc[df.gid_stable.isin(tf_gids), 'tf'] = True
+    # df.drop('gid_stable', axis=1, inplace=True)
 
     # and save
     df.to_csv(o, sep='\t', index=False)
@@ -200,7 +200,6 @@ rule get_g_info:
         threads = 1
     run:
         get_gene_info(input.gtf,
-                      input.tf_file,
                       output.o)
 
 use rule get_g_info as gc_g_info_ref with:
