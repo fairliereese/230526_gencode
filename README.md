@@ -1,4 +1,5 @@
 ```bash
+conda activate modelad_snakemake_2
 snakemake \
   -s Snakefile \
   -j 100 \

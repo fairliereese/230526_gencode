@@ -11,10 +11,13 @@ end_types = ['tss', 'tes']
 
 # data config
 config_fname = '240327_config.tsv'
+
+# TODO this is only looking at the data that GENCODE
+# gave me that hasn't been intersected w/ external cage / polya
 df = parse_input_config(config, config_fname, 'all')
 
 # todo
-species = 'mouse'
+species = 'human'
 df = df.loc[df.species == species]
 # df = df.loc[df.species == 'human']
 
@@ -36,8 +39,11 @@ def get_df_col(df, q_col, q_col_val, t_col):
 wildcard_constraints:
     dataset= '|'.join([re.escape(x) for x in datasets]),
 
+include: 'refs.smk'
+
 rule all:
     input:
+        rules.all_refs.input,
         expand(config['data']['cerb']['trip'],
                zip,
                species=species),
