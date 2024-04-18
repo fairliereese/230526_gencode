@@ -19,7 +19,8 @@
 
 ref:
   human:
-      annot_link: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.annotation.gtf.gz
+      # annot_link: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_43/gencode.v43.annotation.gtf.gz
+      annot_link: https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz
       # fa_link: https://www.encodeproject.org/files/GRCh38_no_alt_analysis_set_GCA_000001405.15/@@download/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.gz
       fa_link: https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz
   mouse:
@@ -27,7 +28,7 @@ ref:
       fa_link: https://www.encodeproject.org/files/mm10_no_alt_analysis_set_ENCODE/@@download/mm10_no_alt_analysis_set_ENCODE.fasta.gz
   annot_gz: ref/{species}/annot.gtf.gz
   annot: ref/{species}/annot.gtf
-  g_info: ref/{species}/annot_g_info.gtf
+  g_info: ref/{species}/annot_g_info.tsv
 
   fa_gz: ref/{species}/ref.fa.gz
   fa: ref/{species}/ref.fa
