@@ -182,7 +182,7 @@ def get_gene_info(gtf, o):
     # df.drop('gid_stable', axis=1, inplace=True)
 
     # and save
-    df = df[['gid', 'gname', 'length', 'biotype', 'biotype_category', 'tf', 'MANE_Select', 'MANE_Plus_Clinical']]
+    df = df[['gid', 'gname', 'length', 'biotype', 'biotype_category', 'MANE_Select', 'MANE_Plus_Clinical']]
     df.to_csv(o, sep='\t', index=False)
 
 rule get_t_info:
