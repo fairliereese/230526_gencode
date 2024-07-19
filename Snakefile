@@ -42,6 +42,7 @@ wildcard_constraints:
 include: 'refs.smk'
 
 rule all:
+    input:
         rules.all_refs.input,
         expand(config['data']['cerb']['trip'],
                zip,
