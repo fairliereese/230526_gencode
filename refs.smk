@@ -187,7 +187,7 @@ def get_gene_info(gtf, o):
 
 rule get_t_info:
     resources:
-        mem_gb = 56,
+        nodes = 1,
         threads = 1
     run:
         get_transcript_info(input.gtf,
@@ -196,7 +196,7 @@ rule get_t_info:
 
 rule get_g_info:
     resources:
-        mem_gb = 56,
+        nodes = 1,
         threads = 1
     run:
         get_gene_info(input.gtf,

@@ -110,7 +110,7 @@ rule all:
 #         "SQANTI3.env"
 #     resources:
 #         threads = 1,
-#         mem_gb = 4
+#         nodes = 1
 #     output:
 #         out = 'beep_env.out'
 #     shell:
@@ -124,21 +124,21 @@ rule all:
 
 rule dl:
     resources:
-        mem_gb = 4,
+        nodes = 1,
         threads = 1
     shell:
         "wget -O {output.out} {params.link}"
 
 rule dl_pass:
     resources:
-        mem_gb = 4,
+        nodes = 1,
         threads = 1
     shell:
         "wget -O {output.out} {params.link} --user={params.user} --password={params.pwd}"
 
 rule gunzip:
     resources:
-        mem_gb = 4,
+        nodes = 1,
         threads = 1
     shell:
         "gunzip -c {input.gz} > {output.out}"
@@ -177,11 +177,11 @@ use rule gunzip as gunzip_artifact with:
 #     output:
 #         out = temporary(config['ref']['annot_gz'])
 
-use rule dl as dl_fa with:
-    params:
-        link = lambda wc: config['ref'][wc.species]['fa_link']
-    output:
-        out = temporary(config['ref']['fa_gz'])
+# use rule dl as dl_fa with:
+#     params:
+#         link = lambda wc: config['ref'][wc.species]['fa_link']
+#     output:
+#         out = temporary(config['ref']['fa_gz'])
 
 # use rule gunzip as gunzip_annot with:
 #     input:
@@ -189,11 +189,11 @@ use rule dl as dl_fa with:
 #     output:
 #         out = config['ref']['annot']
 
-use rule gunzip as gunzip_fa with:
-    input:
-        gz = config['ref']['fa_gz']
-    output:
-        out = config['ref']['fa']
+# use rule gunzip as gunzip_fa with:
+#     input:
+#         gz = config['ref']['fa_gz']
+#     output:
+#         out = config['ref']['fa']
 
 # # get a mapping between the chr names used in the reference
 # # hg38 fa and the gffs
@@ -222,7 +222,7 @@ def get_cerb_settings(wc, df, col):
 
 rule cerb_gtf_to_bed:
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 1
     run:
         cerberus.gtf_to_bed(input.gtf,
@@ -233,7 +233,7 @@ rule cerb_gtf_to_bed:
 
 rule cerb_gtf_to_ics:
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 1
     run:
         cerberus.gtf_to_ics(input.gtf,
@@ -262,7 +262,7 @@ rule get_gff_ab:
     input:
         gff = config['data']['gff']
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 4
     output:
         ab = temporary(config['data']['ab'])
@@ -275,7 +275,7 @@ rule rm_artifcats:
         gff = config['data']['gff'],
     resources:
         threads = 1,
-        mem_gb = 64
+        nodes = 1
     output:
         gtf = config['data']['gtf_filt']
     run:
@@ -296,7 +296,7 @@ rule rm_sirv:
     params:
         chr_map = config['ref']['chr_map']
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 4
     output:
         gtf = config['data']['gtf_no_sirv']
@@ -317,7 +317,7 @@ rule sqanti:
         fa = config['ref']['fa'],
         annot = config['ref']['annot']
     resources:
-        mem_gb = 128,
+        nodes = 2,
         threads = 8
     params:
         sq_path = config['sqanti_path'],
@@ -347,7 +347,7 @@ rule sqanti_filter:
     input:
         gff = config['data']['sqanti_gff']
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 2
     output:
         gtf = config['data']['sqanti_gtf_filt']
@@ -423,7 +423,7 @@ rule cerb_agg_ends:
         files = lambda wc:get_agg_settings(wc, 'file')
     resources:
       threads = 4,
-      mem_gb = 32
+      nodes = 1
     params:
         add_ends = True,
         refs = False,
@@ -447,7 +447,7 @@ rule cerb_agg_ics_cfg:
         files = lambda wc:get_agg_settings(wc, 'file')
     resources:
         threads = 1,
-        mem_gb = 1
+        nodes = 1
     params:
         refs = False,
         sources = lambda wc:get_agg_settings(wc, 'source')
@@ -468,7 +468,7 @@ rule cerb_agg_ics:
        cfg = config['data']['cerb']['agg_ics_cfg']
     resources:
         threads = 16,
-        mem_gb = 128
+        nodes = 2
     output:
         ics = config['data']['cerb']['agg_ics']
     shell:
@@ -483,7 +483,7 @@ rule cerb_agg_ics:
 #       files = lambda wc:get_agg_settings(wc, 'file')
 #   resources:
 #     threads = 16,
-#     mem_gb = 128
+#     nodes = 2
 #   params:
 #       refs = False,
 #       sources = lambda wc:get_agg_settings(wc, 'source')
@@ -508,7 +508,7 @@ rule cerb_write_ref:
                               end_mode='tes')[0]
     resources:
         threads = 4,
-        mem_gb = 64
+        nodes = 1
     output:
         h5 = config['data']['cerb']['ca_ref']
     run:
@@ -523,7 +523,7 @@ rule cerb_write_ref:
 
 rule cerb_annot:
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 16
     run:
         cerberus.annotate_transcriptome(input.gtf,
@@ -586,7 +586,7 @@ rule format_tmerge_ab:
         metric = 'flrpm',
         dataset = lambda wc:wc.dataset
     resources:
-        mem_gb = 4,
+        nodes = 1,
         threads = 1
     output:
         ab = temporary(config['data']['ab_fmt'])
@@ -598,7 +598,7 @@ rule format_tmerge_ab:
 
 rule cerb_ab:
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 2
     run:
         cerberus.replace_ab_ids(input.ab,
@@ -631,7 +631,7 @@ rule agg_ab:
     input:
         abs = lambda wc:get_all_cerb_ab(wc, df)
     resources:
-        mem_gb = 16,
+        nodes = 1,
         threads = 2
     output:
         ab = config['data']['cerb']['agg_ab']
@@ -655,7 +655,7 @@ rule cerb_calc_triplets:
         h5 = lambda wc:get_last_ca_annot(wc, df),
         ab = config['data']['cerb']['agg_ab']
     resources:
-        mem_gb = 64,
+        nodes = 1,
         threads = 2
     params:
         min_tpm = 1
@@ -671,7 +671,7 @@ rule ca_trip to trip:
     input:
         h5 = config['data']['cerb']['ca_trip']
     resources:
-        mem_gb = 16,
+        nodes = 1,
         threads = 1
     output:
         tsv = config['data']['cerb']['trip']
@@ -694,7 +694,7 @@ rule ca_trip to trip:
 #     input:
 #         cas = lambda wc:get_all_ca_annots(wc, df)
 #     resources:
-#         mem_gb = 64,
+#         nodes = 1,
 #         threads = 2
 #     output:
 #         h5 = config['data']['cerb']['ca_all']
