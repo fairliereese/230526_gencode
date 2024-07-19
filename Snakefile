@@ -42,14 +42,15 @@ wildcard_constraints:
 include: 'refs.smk'
 
 rule all:
-    input:
-        expand(config['data']['gff_gz'],
-               species=species,
-               dataset=datasets)
-        # rules.all_refs.input,
-        # expand(config['data']['cerb']['trip'],
-        #        zip,
-        #        species=species),
+        rules.all_refs.input,
+        expand(config['data']['cerb']['trip'],
+               zip,
+               species=species),
+    # input:
+    #     expand(config['data']['gff_gz'],
+    #            species=species,
+    #            dataset=datasets)
+
 
 
         # expand(expand(config['data']['cerb']['ends'],
@@ -141,13 +142,13 @@ rule gunzip:
     shell:
         "gunzip -c {input.gz} > {output.out}"
 
-use rule dl_pass as dl_gff with:
-    params:
-        link = lambda wc: get_dataset_df_col(wc, df, 'link'),
-        user = 'user_cls',
-        pwd = 'Gencode@CLS_2022'
-    output:
-        out = config['data']['gff_gz']
+# use rule dl_pass as dl_gff with:
+#     params:
+#         link = lambda wc: get_dataset_df_col(wc, df, 'link'),
+#         user = 'user_cls',
+#         pwd = 'Gencode@CLS_2022'
+#     output:
+#         out = config['data']['gff_gz']
 
 use rule gunzip as gunzip_gff with:
     input:
