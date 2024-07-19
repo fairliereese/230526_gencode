@@ -43,10 +43,15 @@ include: 'refs.smk'
 
 rule all:
     input:
-        rules.all_refs.input,
-        expand(config['data']['cerb']['trip'],
-               zip,
-               species=species),
+        expand(config['data']['gff_gz'],
+               species=species,
+               dataset=datasets)
+        # rules.all_refs.input,
+        # expand(config['data']['cerb']['trip'],
+        #        zip,
+        #        species=species),
+
+
         # expand(expand(config['data']['cerb']['ends'],
         #     zip,
         #     species=species,
@@ -136,13 +141,13 @@ rule gunzip:
     shell:
         "gunzip -c {input.gz} > {output.out}"
 
-# use rule dl_pass as dl_gff with:
-#     params:
-#         link = lambda wc: get_dataset_df_col(wc, df, 'link'),
-#         user = 'user_cls',
-#         pwd = 'Gencode@CLS_2022'
-#     output:
-#         out = config['data']['gff_gz']
+use rule dl_pass as dl_gff with:
+    params:
+        link = lambda wc: get_dataset_df_col(wc, df, 'link'),
+        user = 'user_cls',
+        pwd = 'Gencode@CLS_2022'
+    output:
+        out = config['data']['gff_gz']
 
 use rule gunzip as gunzip_gff with:
     input:
@@ -164,11 +169,11 @@ use rule gunzip as gunzip_artifact with:
     output:
         out = config['data']['artifact']
 
-use rule dl as dl_annot with:
-    params:
-        link = lambda wc: config['ref'][wc.species]['annot_link']
-    output:
-        out = temporary(config['ref']['annot_gz'])
+# use rule dl as dl_annot with:
+#     params:
+#         link = lambda wc: config['ref'][wc.species]['annot_link']
+#     output:
+#         out = temporary(config['ref']['annot_gz'])
 
 use rule dl as dl_fa with:
     params:
@@ -176,11 +181,11 @@ use rule dl as dl_fa with:
     output:
         out = temporary(config['ref']['fa_gz'])
 
-use rule gunzip as gunzip_annot with:
-    input:
-        gz = config['ref']['annot_gz']
-    output:
-        out = config['ref']['annot']
+# use rule gunzip as gunzip_annot with:
+#     input:
+#         gz = config['ref']['annot_gz']
+#     output:
+#         out = config['ref']['annot']
 
 use rule gunzip as gunzip_fa with:
     input:
@@ -312,8 +317,6 @@ rule sqanti:
     resources:
         mem_gb = 128,
         threads = 8
-    conda:
-        "SQANTI3.env"
     params:
         sq_path = config['sqanti_path'],
         c_path = config['cupcake_path'],
@@ -323,6 +326,7 @@ rule sqanti:
         gff = config['data']['sqanti_gff']
     shell:
         """
+        conda activate /gpfs/projects/bsc83/utils/conda_envs/SQANTI3-5.2.1
         mkdir -p {params.odir}
         python {params.sq_path}sqanti3_qc.py \
             {input.gtf} \
